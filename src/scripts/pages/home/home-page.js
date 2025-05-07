@@ -31,7 +31,6 @@ export default class HomePage {
       }
       </style>
       <h2>Add New Story</h2>
-      <input type="text" name="name" placeholder="Name" required />
       <textarea name="description" placeholder="Description" required></textarea>
       <div class="camera">
         <video id="camera-video" autoplay></video>
@@ -56,25 +55,30 @@ export default class HomePage {
   async handleFormSubmit(event) {
     event.preventDefault();
     const form = event.target;
-  
     const formData = new FormData(form);
-    const storyData = {
-      name: formData.get('name'),
-      description: formData.get('description'),
-      lat: parseFloat(formData.get('lat')),
-      lon: parseFloat(formData.get('lon')),
-      photoBase64: formData.get('photoBase64'),
-    };    
+
+    formData.set("description", String(formData.get("description")));
+    formData.set("lat", formData.get("lat"));
+    formData.set("lon", formData.get("lon"));
+  
+    const canvas = document.getElementById("camera-canvas");
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg"));
+    formData.append("photo", blob, "photo.jpg");
   
     try {
-      await StoriesAPI.addStory(storyData);
-      alert('Story added!');
-      form.reset();
-      this.afterRender(); // Refresh stories
+      const response = await StoriesAPI.addStory(formData);
+      if (response.ok) {
+        alert("Story added!");
+        form.reset();
+        this.afterRender();
+      } else {
+        alert("Failed to add story: " + (response.message || "Unknown error"));
+      }
     } catch (err) {
-      console.error('Failed to add story:', err);
+      console.error("Failed to add story:", err);
     }
   }
+  
   
 
   //TODO: Pilih lokasi add story

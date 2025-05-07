@@ -21,13 +21,13 @@ export async function getAllStories() {
 
 }
 
-export async function addStory(story) {
+export async function addStory(formData) {
   const fetchResponse = await fetch(ENDPOINTS.ADD_STORY, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${CONFIG.ACCESS_TOKEN}`,
+      "Authorization": `Bearer ${CONFIG.ACCESS_TOKEN}`,
     },
-    body: JSON.stringify(story),
+    body: formData,
   });
   const json = await fetchResponse.json();
 
