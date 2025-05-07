@@ -1,4 +1,4 @@
-import CONFIG from '../config';
+import CONFIG from "../config";
 
 const ENDPOINTS = {
   GET_ALL_STORIES: `${CONFIG.BASE_URL}/stories`,
@@ -6,13 +6,13 @@ const ENDPOINTS = {
 
 export async function getAllStories() {
   const fetchResponse = await fetch(ENDPOINTS.GET_ALL_STORIES, {
-    method: 'GET',
+    method: "GET",
     headers: {
       Authorization: `Bearer ${CONFIG.ACCESS_TOKEN}`,
-    }
+    },
   });
   const json = await fetchResponse.json();
-  
+
   return {
     ...json,
     ok: fetchResponse.ok,
