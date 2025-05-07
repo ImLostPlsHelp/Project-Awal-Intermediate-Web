@@ -2,6 +2,7 @@ import CONFIG from "../config";
 
 const ENDPOINTS = {
   GET_ALL_STORIES: `${CONFIG.BASE_URL}/stories`,
+  ADD_STORY: `${CONFIG.BASE_URL}/stories`,
 };
 
 export async function getAllStories() {
@@ -10,6 +11,23 @@ export async function getAllStories() {
     headers: {
       Authorization: `Bearer ${CONFIG.ACCESS_TOKEN}`,
     },
+  });
+  const json = await fetchResponse.json();
+
+  return {
+    ...json,
+    ok: fetchResponse.ok,
+  };
+
+}
+
+export async function addStory(story) {
+  const fetchResponse = await fetch(ENDPOINTS.ADD_STORY, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${CONFIG.ACCESS_TOKEN}`,
+    },
+    body: JSON.stringify(story),
   });
   const json = await fetchResponse.json();
 
