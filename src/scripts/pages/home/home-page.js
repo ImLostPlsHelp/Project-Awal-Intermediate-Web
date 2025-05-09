@@ -65,16 +65,17 @@ export default class HomePage {
   //TODO: Pilih lokasi add story
   initFormMap() {
     const map = L.map("map-form").setView([-7.2575, 112.7521], 13);
+  
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors",
     }).addTo(map);
-
+  
     let marker;
     map.on("click", function (e) {
       const { lat, lng } = e.latlng;
       if (marker) marker.setLatLng(e.latlng);
       else marker = L.marker(e.latlng).addTo(map);
-
+  
       document.querySelector('[name="lat"]').value = lat;
       document.querySelector('[name="lon"]').value = lng;
     });
@@ -93,8 +94,23 @@ export default class HomePage {
       .bindPopup(`<strong>${story.name}</strong>`);
   }
 
+  // destroyMap() {
+  //   const mapContainers = document.querySelectorAll(".leaflet-container");
+  
+  //   mapContainers.forEach((mapContainer) => {
+  //     if (mapContainer._leaflet_map_instance) {
+  //       mapContainer._leaflet_map_instance.remove();
+  //       mapContainer._leaflet_map_instance = null;
+  //       mapContainer.innerHTML = "";
+  //     }
+  //   });
+  // }
+  
+  
+
   renderStories(stories) {
     const storiesList = document.getElementById("stories-list");
+    storiesList.innerHTML = "";
 
     stories.forEach((story) => {
       const storyItem = document.createElement("div");
@@ -118,11 +134,18 @@ export default class HomePage {
     console.error(error);
   }
 
-  onStoryAdded() {
+  async onStoryAdded() {
     alert("Story added!");
     document.getElementById("add-story-form").reset();
-    this.presenter.getAllStories();
     this.capturedPhotoFile = null;
+  
+    try {
+      const response = await this.presenter.getAllStories();
+      const stories = response.listStory;
+      this.renderStories(stories);
+    } catch (error) {
+      this.showError(error.message);
+    }
   }
 
   showError(message) {
