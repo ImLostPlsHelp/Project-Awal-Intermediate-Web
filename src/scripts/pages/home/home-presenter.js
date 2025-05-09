@@ -16,15 +16,6 @@ export default class HomePresenter {
     }
   }
 
-  async addStory(formData) {
-    const response = await this.#model.addStory(formData);
-    if (response.ok) {
-      return response;
-    } else {
-      this.#view.showError(response.message);
-    }
-  }
-
 async handleFormSubmit(formData) {
   try {
     const response = await this.#model.addStory(formData);
