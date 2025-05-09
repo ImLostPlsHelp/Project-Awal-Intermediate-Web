@@ -15,4 +15,27 @@ export default class HomePresenter {
       throw new Error("Failed to fetch stories");
     }
   }
+
+  async addStory(formData) {
+    const response = await this.#model.addStory(formData);
+    if (response.ok) {
+      return response;
+    } else {
+      this.#view.showError(response.message);
+    }
+  }
+
+async handleFormSubmit(formData) {
+  try {
+    const response = await this.#model.addStory(formData);
+    if (response.ok) {
+      this.#view.onStoryAdded();
+    } else {
+      this.#view.showError(response.message);
+    }
+  } catch (error) {
+    this.#view.showError("Network error");
+  }
+}
+
 }

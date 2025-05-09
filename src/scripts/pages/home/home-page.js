@@ -2,6 +2,12 @@ import HomePresenter from "./home-presenter";
 import * as StoriesAPI from "../../data/api";
 
 export default class HomePage {
+
+  constructor() {
+    this.presenter = new HomePresenter({ view: this, model: StoriesAPI });
+    this.showError = this.showError.bind(this);
+    this.onStoryAdded = this.onStoryAdded.bind(this);
+  }
   async render() {
     return `
       <section class="container">
@@ -48,33 +54,12 @@ export default class HomePage {
     target.appendChild(form);
 
     this.initFormMap();
-    form.addEventListener("submit", this.handleFormSubmit.bind(this));
-  }
-
-  async handleFormSubmit(event) {
-    event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-
-    formData.set("description", String(formData.get("description")));
-    formData.set("lat", formData.get("lat"));
-    formData.set("lon", formData.get("lon"));
-  
-    formData.append("photo", this.capturedPhotoFile);
-  
-    try {
-      const response = await StoriesAPI.addStory(formData);
-      if (response.ok) {
-        alert("Story added!");
-        form.reset();
-        this.afterRender();
-        this.capturedPhotoFile = null;
-      } else {
-        alert("Failed to add story: " + (response.message || "Unknown error"));
-      }
-    } catch (err) {
-      console.error("Failed to add story:", err);
-    }
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      formData.append("photo", this.capturedPhotoFile);
+      await this.presenter.handleFormSubmit(formData);
+    });
   }
   
   //TODO: Pilih lokasi add story
@@ -133,19 +118,26 @@ export default class HomePage {
     console.error(error);
   }
 
-  async afterRender() {
-    const homePresenter = new HomePresenter({
-      view: this,
-      model: StoriesAPI,
-    });
+  onStoryAdded() {
+    alert("Story added!");
+    document.getElementById("add-story-form").reset();
+    this.presenter.getAllStories();
+    this.capturedPhotoFile = null;
+  }
 
+  showError(message) {
+    alert("Error: " + message);
+    console.log(message);
+  }
+
+  async afterRender() {
     try {
-      const response = await homePresenter.getAllStories();
+      const response = await this.presenter.getAllStories();
       const stories = response.listStory;
 
       this.renderStories(stories);
     } catch (error) {
-      console.error("Failed to fetch stories:", error);
+      this.showError(error.message);
     }
 
     document.getElementById("add-story-button").addEventListener("click", () => {
