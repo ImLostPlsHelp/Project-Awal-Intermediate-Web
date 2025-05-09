@@ -39,7 +39,6 @@ export default class HomePage {
         <ul id="camera-list-output"></ul>
         <select id="camera-list-select"></select>
       </div>
-      <input type="hidden" name="photoBase64" />
       <div id="map-form" class="map" style="height: 300px;"></div>
       <input type="hidden" name="lat" />
       <input type="hidden" name="lon" />
@@ -61,9 +60,7 @@ export default class HomePage {
     formData.set("lat", formData.get("lat"));
     formData.set("lon", formData.get("lon"));
   
-    const canvas = document.getElementById("camera-canvas");
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg"));
-    formData.append("photo", blob, "photo.jpg");
+    formData.append("photo", this.capturedPhotoFile);
   
     try {
       const response = await StoriesAPI.addStory(formData);
@@ -71,6 +68,7 @@ export default class HomePage {
         alert("Story added!");
         form.reset();
         this.afterRender();
+        this.capturedPhotoFile = null;
       } else {
         alert("Failed to add story: " + (response.message || "Unknown error"));
       }
@@ -79,8 +77,6 @@ export default class HomePage {
     }
   }
   
-  
-
   //TODO: Pilih lokasi add story
   initFormMap() {
     const map = L.map("map-form").setView([-7.2575, 112.7521], 13);
@@ -156,7 +152,7 @@ export default class HomePage {
       const existingForm = document.getElementById("add-story-form");
       if (!existingForm) {
         this.renderAddStoryForm();
-        this.initCamera(); // Optional: jika kamera perlu langsung aktif
+        this.initCamera();
       } else {
         existingForm.style.display = existingForm.style.display === "none" ? "block" : "none";
       }
@@ -173,7 +169,6 @@ export default class HomePage {
     const cameraTakeButton = document.getElementById("camera-take-button");
     const cameraOutputList = document.getElementById("camera-list-output");
     const cameraListSelect = document.getElementById("camera-list-select");
-    const hiddenInput = document.querySelector('[name="photoBase64"]');
 
     let currentStream;
 
@@ -224,18 +219,29 @@ export default class HomePage {
       cameraLaunch(currentStream);
     });
 
-    cameraTakeButton.addEventListener("click", () => {
+    cameraTakeButton.addEventListener("click", async () => {
       const context = cameraCanvas.getContext("2d");
+    
       if (width && height) {
         cameraCanvas.width = width;
         cameraCanvas.height = height;
         context.drawImage(cameraVideo, 0, 0, width, height);
-
-        const dataUrl = cameraCanvas.toDataURL("image/png");
-        cameraOutputList.innerHTML = `<li><img src="${dataUrl}" alt="Captured" /></li>`;
-        hiddenInput.value = dataUrl;
+    
+        cameraCanvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], "photo.png", { type: "image/png" });
+            this.capturedPhotoFile = file;
+    
+            const previewURL = URL.createObjectURL(file);
+            cameraOutputList.innerHTML = `<li><img src="${previewURL}" alt="Captured" /></li>`;
+          } else {
+            console.error("Gagal mengambil blob dari canvas.");
+          }
+        }, "image/png");
       }
     });
+    
+    
 
     cameraVideo.addEventListener("canplay", () => {
       if (!streaming) {
