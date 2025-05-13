@@ -100,6 +100,31 @@ header {
 
 /* Write your styles more here */
 
+.skip-to-content {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  color: red;
+}
+
+.skip-to-content:focus {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #000;
+  color: #fff;
+  padding: 8px 16px;
+  z-index: 10000;
+  height: auto;
+  width: auto;
+  clip: auto;
+  text-decoration: none;
+}
+
+
+
 @media screen and (width > 1000px) {
   .navigation-drawer {
     min-height: auto;
