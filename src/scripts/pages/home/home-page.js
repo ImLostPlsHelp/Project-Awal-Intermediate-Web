@@ -2,7 +2,6 @@ import HomePresenter from "./home-presenter";
 import * as StoriesAPI from "../../data/api";
 
 export default class HomePage {
-
   constructor() {
     this.presenter = new HomePresenter({ view: this, model: StoriesAPI });
     this.showError = this.showError.bind(this);
@@ -61,21 +60,21 @@ export default class HomePage {
       await this.presenter.handleFormSubmit(formData);
     });
   }
-  
+
   //TODO: Pilih lokasi add story
   initFormMap() {
     const map = L.map("map-form").setView([-7.2575, 112.7521], 13);
-  
+
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors",
     }).addTo(map);
-  
+
     let marker;
     map.on("click", function (e) {
       const { lat, lng } = e.latlng;
       if (marker) marker.setLatLng(e.latlng);
       else marker = L.marker(e.latlng).addTo(map);
-  
+
       document.querySelector('[name="lat"]').value = lat;
       document.querySelector('[name="lon"]').value = lng;
     });
@@ -93,20 +92,6 @@ export default class HomePage {
       .addTo(map)
       .bindPopup(`<strong>${story.name}</strong>`);
   }
-
-  // destroyMap() {
-  //   const mapContainers = document.querySelectorAll(".leaflet-container");
-  
-  //   mapContainers.forEach((mapContainer) => {
-  //     if (mapContainer._leaflet_map_instance) {
-  //       mapContainer._leaflet_map_instance.remove();
-  //       mapContainer._leaflet_map_instance = null;
-  //       mapContainer.innerHTML = "";
-  //     }
-  //   });
-  // }
-  
-  
 
   renderStories(stories) {
     const storiesList = document.getElementById("stories-list");
@@ -138,7 +123,7 @@ export default class HomePage {
     alert("Story added!");
     document.getElementById("add-story-form").reset();
     this.capturedPhotoFile = null;
-  
+
     try {
       const response = await this.presenter.getAllStories();
       const stories = response.listStory;
@@ -163,15 +148,19 @@ export default class HomePage {
       this.showError(error.message);
     }
 
-    document.getElementById("add-story-button").addEventListener("click", () => {
-      const existingForm = document.getElementById("add-story-form");
-      if (!existingForm) {
-        this.renderAddStoryForm();
-        this.initCamera();
-      } else {
-        existingForm.style.display = existingForm.style.display === "none" ? "block" : "none";
-      }
-    });
+    document
+      .getElementById("add-story-button")
+      .addEventListener("click", () => {
+        const existingForm = document.getElementById("add-story-form");
+        if (!existingForm) {
+          this.renderAddStoryForm();
+          this.initCamera();
+          document.getElementById("add-story-form").style.display = "block";
+        } else {
+          existingForm.style.display =
+            existingForm.style.display === "block" ? "none" : "block";
+        }
+      });
   }
 
   async initCamera() {
@@ -236,17 +225,17 @@ export default class HomePage {
 
     cameraTakeButton.addEventListener("click", async () => {
       const context = cameraCanvas.getContext("2d");
-    
+
       if (width && height) {
         cameraCanvas.width = width;
         cameraCanvas.height = height;
         context.drawImage(cameraVideo, 0, 0, width, height);
-    
+
         cameraCanvas.toBlob((blob) => {
           if (blob) {
             const file = new File([blob], "photo.png", { type: "image/png" });
             this.capturedPhotoFile = file;
-    
+
             const previewURL = URL.createObjectURL(file);
             cameraOutputList.innerHTML = `<li><img src="${previewURL}" alt="Captured" /></li>`;
           } else {
@@ -255,8 +244,6 @@ export default class HomePage {
         }, "image/png");
       }
     });
-    
-    
 
     cameraVideo.addEventListener("canplay", () => {
       if (!streaming) {
@@ -273,4 +260,3 @@ export default class HomePage {
     cameraLaunch(currentStream);
   }
 }
-
