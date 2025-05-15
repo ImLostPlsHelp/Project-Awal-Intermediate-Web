@@ -1,9 +1,9 @@
 import HomePage from "../pages/home/home-page";
-import AboutPage from "../pages/about/about-page";
+import AddStory from "../pages/addstory/addstory-page";
 
 const routes = {
   "/": new HomePage(),
-  "/about": new AboutPage(),
+  "/add": new AddStory(),
 };
 
 export default routes;
