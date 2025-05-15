@@ -44,3 +44,8 @@ export function getRoute(pathname) {
 export function parsePathname(pathname) {
   return extractPathnameSegments(pathname);
 }
+
+export function navigateTo(path) {
+  const sanitizedPath = path.startsWith("/") ? path : `/${path}`;
+  window.location.hash = sanitizedPath;
+}
