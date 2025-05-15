@@ -44,7 +44,8 @@ export default class HomePage {
       }
       </style>
       <h2>Add New Story</h2>
-      <textarea name="description" placeholder="Description" required></textarea>
+      <label for="description">Story Description</label>
+      <textarea name="description" id="description" placeholder="Description" required></textarea>
       <div class="camera">
         <video id="camera-video" autoplay></video>
         <button type="button" id="camera-take-button">Take Photo</button>
