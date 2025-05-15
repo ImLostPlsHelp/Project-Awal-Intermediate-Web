@@ -80,43 +80,52 @@ export default class HomePage {
     });
   }
 
-  initMap(story) {
+  initMap(stories) {
     const rasterTile = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    const defaultLocation = [-7.2575, 112.7521];
+    const map = L.map("stories-map").setView(defaultLocation, 13);
 
-    const map = L.map(`map-${story.id}`).setView([story.lat, story.lon], 13);
     L.tileLayer(rasterTile, {
       attribution: "&copy; OpenStreetMap contributors",
     }).addTo(map);
 
-    L.marker([story.lat, story.lon])
-      .addTo(map)
-      .bindPopup(`<strong>${story.name}</strong>`);
+    const markerGroup = L.featureGroup();
+
+    stories.forEach((story) => {
+      if (story.lat && story.lon) {
+        const marker = L.marker([story.lat, story.lon]).bindPopup(
+          `<strong>${story.name}</strong><br>${story.description}`
+        );
+        markerGroup.addLayer(marker);
+      }
+    });
+
+    markerGroup.addTo(map);
+
+    if (markerGroup.getLayers().length > 0) {
+      map.fitBounds(markerGroup.getBounds());
+    }
   }
 
   renderStories(stories) {
     const storiesList = document.getElementById("stories-list");
-    storiesList.innerHTML = "";
+    storiesList.innerHTML = `
+    <div id="stories-map" class="map" style="height: 400px; margin-bottom: 2rem;"></div>
+  `;
 
     stories.forEach((story) => {
       const storyItem = document.createElement("div");
       storyItem.classList.add("story-item");
-      storyItem.classList.add(story.id);
       storyItem.innerHTML = `
-        <h3>${story.name}</h3>
-        <p>${story.description}</p>
-        <p>${story.createdAt}</p>
-        <img src="${story.photoUrl}" alt="${story.name}" />
-        <div id="map-${story.id}" class="map" style="height: 300px; width:500px; margin-top: 1rem;"></div>
-      `;
+      <h3>${story.name}</h3>
+      <p>${story.description}</p>
+      <p>${story.createdAt}</p>
+      <img src="${story.photoUrl}" alt="${story.name}" />
+    `;
       storiesList.appendChild(storyItem);
-
-      if (story.lat && story.lon) {
-        this.initMap(story);
-      }
     });
-  }
-  catch(error) {
-    console.error(error);
+
+    this.initMap(stories);
   }
 
   async onStoryAdded() {
