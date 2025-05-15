@@ -6,7 +6,9 @@ export default class HomePage {
     this.presenter = new HomePresenter({ view: this, model: StoriesAPI });
     this.showError = this.showError.bind(this);
     this.onStoryAdded = this.onStoryAdded.bind(this);
+    this.cameraStream = null;
   }
+
   async render() {
     return `
       <section class="container">
@@ -23,6 +25,12 @@ export default class HomePage {
       </section>
     `;
   }
+
+  stopCurrentStream = () => {
+      if (!(this.cameraStream instanceof MediaStream)) return;
+      this.cameraStream.getTracks().forEach((track) => track.stop());
+      this.cameraStream = null;
+    };
 
   renderAddStoryForm() {
     const form = document.createElement("form");
@@ -57,6 +65,7 @@ export default class HomePage {
       e.preventDefault();
       const formData = new FormData(e.target);
       formData.append("photo", this.capturedPhotoFile);
+      this.stopCurrentStream();
       await this.presenter.handleFormSubmit(formData);
     });
   }
@@ -183,14 +192,7 @@ export default class HomePage {
     const cameraOutputList = document.getElementById("camera-list-output");
     const cameraListSelect = document.getElementById("camera-list-select");
 
-    let currentStream;
-
-    function stopCurrentStream() {
-      if (!(currentStream instanceof MediaStream)) return;
-      currentStream.getTracks().forEach((track) => track.stop());
-    }
-
-    async function getStream() {
+    const getStream = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
@@ -206,7 +208,7 @@ export default class HomePage {
       } catch (error) {
         console.error("Camera error:", error);
       }
-    }
+    };
 
     async function populateCameraList() {
       const devices = await navigator.mediaDevices.enumerateDevices();
@@ -221,15 +223,15 @@ export default class HomePage {
         .join("");
     }
 
-    function cameraLaunch(stream) {
+    const cameraLaunch = (stream) => {
       cameraVideo.srcObject = stream;
       cameraVideo.play();
-    }
+    };
 
     cameraListSelect.addEventListener("change", async () => {
-      stopCurrentStream();
-      currentStream = await getStream();
-      cameraLaunch(currentStream);
+      this.stopCurrentStream();
+      this.cameraStream = await getStream();
+      cameraLaunch(this.cameraStream);
     });
 
     cameraTakeButton.addEventListener("click", async () => {
@@ -265,7 +267,7 @@ export default class HomePage {
       }
     });
 
-    currentStream = await getStream();
-    cameraLaunch(currentStream);
+    this.cameraStream = await getStream();
+    cameraLaunch(this.cameraStream);
   }
 }
