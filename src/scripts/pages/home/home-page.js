@@ -4,6 +4,7 @@ import * as StoriesAPI from "../../data/api";
 export default class HomePage {
   constructor() {
     this.presenter = new HomePresenter({ view: this, model: StoriesAPI });
+    this.showError = this.showError.bind(this);
   }
 
   async render() {
@@ -17,6 +18,11 @@ export default class HomePage {
         <div id="stories-list" class="stories-list"></div>
       </section>
     `;
+  }
+
+  showError(message) {
+    alert("Error: " + message);
+    console.log(message);
   }
 
   initMap(stories) {
