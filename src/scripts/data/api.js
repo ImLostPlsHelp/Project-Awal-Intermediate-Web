@@ -42,11 +42,13 @@ export async function addStory(formData) {
 export async function login(email, password) {
   const fetchResponse = await fetch(ENDPOINTS.LOGIN, {
     method: "POST",
-    body: 
-    JSON.stringify({
-      email,
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      email, 
       password,
-    })
+    }),
   });
   const json = await fetchResponse.json();
 
@@ -59,12 +61,14 @@ export async function login(email, password) {
 export async function register(name, email, password) {
     const fetchResponse = await fetch(ENDPOINTS.REGISTER, {
     method: "POST",
-    body: 
-    JSON.stringify({
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
       name,
       email,
       password,
-    })
+    }),
   });
   const json = await fetchResponse.json();
 

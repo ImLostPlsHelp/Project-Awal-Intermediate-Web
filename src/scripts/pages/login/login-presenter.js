@@ -11,16 +11,22 @@ export default class LoginPresenter {
 
   async handleLogin(email, password) {
     try {
-        const response = await this.#model.login(email,password);
-        if (response.ok) {
-            const data = response.json();
-            localStorage.setItem("token", data.token);
-            navigateTo("/");
+      const response = await this.#model.login(email, password);
+
+      if (response.ok) {
+        console.log(response.loginResult.token);
+        if (response.loginResult.token) {
+          localStorage.setItem("token", response.loginResult.token);
+          navigateTo("/");
         } else {
-            this.#view.showError(response.message);
+          this.#view.showError("Invalid token received.");
         }
+      } else {
+        this.#view.showError(response.message || "Login failed.");
+      }
     } catch (error) {
-        this.#view.showError("Something went wrong");
+      console.error(error);
+      this.#view.showError("Something went wrong.");
     }
   }
 }

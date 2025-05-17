@@ -1,6 +1,7 @@
 import HomePage from "../pages/home/home-page";
 import AddStory from "../pages/addstory/addstory-page";
 import LoginPage from "../pages/login/login-page";
+import RegisterPage from "../pages/register/register-page";
 import { getTokenOrRedirect } from "../utils";
 import { getActiveRoute } from "./url-parser";
 
@@ -8,6 +9,7 @@ const routes = {
   "/": new HomePage(),
   "/add": new AddStory(),
   "/login": new LoginPage(),
+  "/register": new RegisterPage(),
 };
 
 const publicRoutes = ["/login", "/register"];
