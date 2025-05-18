@@ -9,8 +9,11 @@ export default class LoginPage {
     return `
       <h2>Login</h2>
       <form id="login-form">
+        <label for="email">Email</label>
         <input type="email" name="email" placeholder="Email" required />
+        <label for="password">Password</label>
         <input type="password" name="password" placeholder="Password" required />
+        <br>
         <button type="submit">Login</button>
       </form>
 

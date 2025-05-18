@@ -11,9 +11,13 @@ export default class RegisterPage {
     return `
       <h2>Register</h2>
       <form id="register-form">
-      <input type="name" name="name" placeholder="Name" required />
+        <label for="name">Name</label>
+        <input type="name" name="name" placeholder="Name" required />
+        <label for="email">Email</label>
         <input type="email" name="email" placeholder="Email" required />
+        <label for="password">Password</label>
         <input type="password" name="password" placeholder="Password" required />
+        <br>
         <button type="submit">Register</button>
       </form>
 
